@@ -2,7 +2,7 @@
 
 /*
 NeleBotFramework
-	Copyright (C) 2018  PHP-Coders
+	Copyright (C) 2018  NeleBot Framework
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ NeleBotFramework
 $config = [
 	# Configurazione del bot
 	'cloni' => [
-		123456789 => "UsernameBot"
+		1161578505 => "NeleBotXBot"
 	],
 	// Metti qui l'ID che indica l'username di ogni Bot (senza @)
 	'password' => false,
@@ -32,19 +32,19 @@ $config = [
 		244432022 // Nele
 	],
 	// ID degli Amministratori del Bot
-	'devmode' => false,
+	'devmode' => true,
 	// Developer Mode | Attivala quando il Bot è in fase di testing
 	'method' => 'post',
 	// Scegli get o post come metodo delle request cURL | Uso Default sulle funzioni
-	'response' => false,
+	'response' => true,
 	// Risposta alla request | Uso Default sulle funzioni
 	'request_timeout' => 2,
 	// Timeout dell richiesta
-	'json_payload' => true,
+	'json_payload' => false,
 	// Json Payload è valido solo per le request senza response
-	'usa_il_db' => false,
+	'usa_il_db' => true,
 	// Decidi se usare il Database | Consigliato l'uso del Database solo dopo i primi test
-	'usa_redis' => false,
+	'usa_redis' => true,
 	// Decidi se usare Redis
 	'logs' => false,
 	// Memorizza le updates del tuo Bot (sconsigliato l'utilizzo)
@@ -61,15 +61,9 @@ $config = [
 	// Array di Log da non reportare (Esempio: ['redis'])
 	'console' => 244432022,
 	// Inserisci l'ID della chat in cui vuoi mandare i log importanti e gli errori (Cambia quello già inserito) oppure metti false per non utilizzarlo.
-	'whitelist_users' => false,
-	// Blocca gli utenti sconosciuti | Admins auto-inclusi
-	'whitelist_chats' => false,
-	// Blocca le chat sconosciute (gruppi, supergruppi e canali)
-	// false: Whitelist spenta
-	// Array: Whitelist accesa
 	
 	# Impostazioni messaggi
-	'operatori_comandi' => ['/', '!', '.', '>'], 
+	'operatori_comandi' => ['/'],
 	// Utilizzo comandi del Bot (Es: /cmd !cmd .cmd)
 	'post_canali' => true,
 	// Decidi se i comandi funzionano anche per i messaggi dai canali
@@ -84,8 +78,8 @@ $config = [
 	'disabilita_anteprima_link' => true,
 	// Disabilita l'anteprima dei link | Uso Default sulle funzioni
 	
-	'version' => "2.6.4"
-	// Versione di NeleBot
+	'version' => "2.6.4-BotX_1.0"
+	// Versione di NeleBot (BotX version)
 ];
 if (!isset($config['cloni'][$botID])) {
 	if ($config['devmode']) {
@@ -101,11 +95,11 @@ if (!isset($config['cloni'][$botID])) {
 
 # Dati di accesso al database
 $database = [
-	'type' => "mysql",
+	'type' => "postgre",
 	// Inserisci 'sqlite', 'mysql' o 'postgre' per scegliere il tipo di Database
-	'nome_database' => "",
+	'nome_database' => "nelebotx",
 	// Nome del database (o nome del file per SQLite)
-	'utente' => "",
+	'utente' => "nelebotx",
 	// Se usi un' altro utente, sostituisci root con il nome.
 	'password' => "",
 	// Password del utente di accesso

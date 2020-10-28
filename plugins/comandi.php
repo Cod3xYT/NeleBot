@@ -2,7 +2,7 @@
 
 /*
 NeleBotFramework
-	Copyright (C) 2018  PHP-Coders
+	Copyright (C) 2018  NeleBot Framework
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -18,8 +18,68 @@ NeleBotFramework
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*
+	Ricordati che questo file serve solo
+	come esempio per gli sviluppatori!
+	Se qualcosa non va, contatta il gruppo
+	di supporto su Telegram: @NeleBotSupport
+*/
+
+if ($cmd == "reload" and in_array($typechat, ["group", "supergroup"])) {
+	if ($get = $redis->get("reload_$chatID")) {
+		die;
+	}
+	$redis->set("reload_$chatID", true, ['nx', 'ex' => 10]);
+	$getchat = getChat($chatID);
+	if (isset($getchat['result']['permissions'])) {
+		$perms = $getchat['result']['permissions'];
+	} else {
+		$perms = ["can_send_messages" => true, "can_send_media_messages" => true, "can_send_polls" => true, "can_send_other_messages" => true, "can_add_web_page_previews" => true, "can_change_info" => false, "can_invite_users" => false, "can_pin_messages" => false];
+	}
+	if (isset($getchat['result']['description'])) {
+		$descrizione = $getchat['result']['description'];				
+	} else {
+		$descrizione = "";
+	}
+	$admins = getAdmins($chatID);
+	if (isset($admins['ok'])) {
+		$adminsg = json_encode($admins['result']);
+	} else {
+		$adminsg = "[]";
+	}
+	db_query("UPDATE gruppi SET title = ?, username = ?, admins = ?, description = ?, page = ' ' WHERE chat_id = ?", [$title, $usernamechat, $adminsg, $descrizione, $chatID]);
+	$t = "✅ " . getTranslate('textReloadedChat');
+	sm($chatID, $t, 'nascondi');
+	die;
+}
+if ($cmd == "cancel" or strpos($cbdata, "cancel") === 0) {
+	if ($u['page'] or $redis->get("botx.command{$userID}")) {
+		if (isset($bot['settings']['messages']['CommandCanceled'])) {
+			$t = $bot['settings']['messages']['CommandCanceled'];
+		} else {
+			$t = "😕 " . getTranslate('messageCommandCanceled');
+		}
+	} else {
+		if (isset($bot['settings']['messages']['noCommandRunning'])) {
+			$t = $bot['settings']['messages']['noCommandRunning'];
+		} else {
+			$t = "😴 " . getTranslate('messageNoCommandRunning');
+		}
+	}
+	db_query("UPDATE utenti SET page = ? WHERE user_id = ?", ["", $userID], "no");
+	if ($cmd) {
+		sm($chatID, $t, 'nascondi');
+		die;
+	} elseif ($cbdata == "cancel") {
+		cb_reply($cbid, '', false, $cbmid, $t);
+		die;
+	} else {
+		$cbdata = str_replace("cancel-", '', $cbdata);
+	}
+}
+
 if ($cmd == 'start') {
-	sm($chatID, bold("Bot avviato!") . "\nUsa /help per una lista di comandi.\nℹ️ " . code("Versione {$config['version']}"));
+	sm($chatID, getTranslate('messageStartDevelopment', [$config['version']]));
 	die;
 }
 
@@ -35,6 +95,10 @@ if ($cmd == "menu" or $cmd == "mediamenu" or $cbdata == "menu") {
 		[
 			"text" => "ℹ️ Info",
 			"callback_data" => "info"
+		],
+		[
+			"text" => "ℹ️ Test",
+			"callback_data" => "report"
 		]
 	];
 	if ($cmd == "menu") {
@@ -77,20 +141,8 @@ if ($cbdata == "del") {
 	die;
 }
 
-if ($cmd == 'cancel') {
-	db_query("UPDATE utenti SET page = ? WHERE user_id = ?", ["", $userID]);
-	sm($chatID, "Comando annullato.", 'nascondi');
-	die;
-}
-
 if ($u['page'] == "testMessage" and $typechat == "private") {
 	sm($chatID, "Tipo di messaggio: $messageType");
-	die;
-}
-
-if ($cmd == "dice") {
-	sdice($chatID, "🏀");
-	sm($chatID, tag() . ", vergognati, mi hai appena chiesto di fare la cosa più inutile di Telegram, fai /help e rendimi utile...");
 	die;
 }
 
@@ -320,7 +372,7 @@ if ($cmd == 'propic') {
 }
 
 if ($cmd == 'contact') {
-	sc($chatID, "+13253080284", "Presidente", "VoIP");
+	sc($chatID, "+13253080584", "Name", "Surname");
 	die;
 }
 
@@ -446,4 +498,25 @@ if ($cbdata == 'stopLocation') {
 	cb_reply($cbid, 'Posizionamento terminato', true);
 	stopLocation($chatID, $cbmid, $menu);
 	die;
+}
+
+if ($messageType == "callback_query") {
+	cb_reply($cbid, "🧐 " . getTranslate('callbackNotFound', [$cbdata]), true);
+} else {
+	if ($typechat == "private") {
+		if ($cmd) {
+			if (isset($bot['settings']['messages']['unknownCommand'])) {
+				$t = $bot['settings']['messages']['unknownCommand'];
+			} else {
+				$t = "🙃 " . getTranslate('messageUnknownCommand');
+			}
+		} else {
+			if (isset($bot['settings']['messages']['noCommandRunning'])) {
+				$t = $bot['settings']['messages']['noCommandRunning'];
+			} else {
+				$t = "😴 " . getTranslate('messageNoCommandRunning');
+			}
+		}
+		sm($chatID, $t);
+	}
 }

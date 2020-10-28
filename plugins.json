@@ -1,6 +1,4 @@
 {
-    "gestione.php": true,
-    "inline.php": true,
-    "comandi.php": true,
-    "gruppi.php": true
+    "languages.php": true,
+    "comandi.php": true
 }

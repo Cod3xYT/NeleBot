@@ -2,7 +2,7 @@
 
 /*
 NeleBotFramework
-	Copyright (C) 2018  PHP-Coders
+	Copyright (C) 2018  NeleBot Framework
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ $f = [
 	'database' => 'database.php', // File PHP
 	'404' => 'index.html', // Pagina HTML di errore 404
 	'plugin_manager' => 'plugin_manager.php', // File PHP
+	'languages' => 'languages.json', // File JSON
 	'plugins.dir' => 'plugins', // Cartella dei plugins
 	'plugins' => 'plugins.json' // File JSON
 ];
@@ -48,19 +49,18 @@ $api = urldecode($_GET['key']); // Chiave di accesso alle BotAPI
 $botID = str_replace('bot', '', explode(":", $api)[0]); // ID del Bot
 require $f['config']; // Configurazioni del Bot
 $admins = $config['admins']; // Amministratori del Bot
-$password = urldecode($_GET['password']); //Password delle request
 
 # Config per gli errori di php
+ini_set('error_reporting', !E_ALL | E_PARSE | E_WARNING | E_ERROR);
 ini_set('memory_limit', -1);
 ini_set('display_startup_errors', $config['devmode']);
 ini_set('display_errors', $config['devmode']);
-ini_set('error_reporting', !E_ALL | E_PARSE | E_WARNING | E_ERROR);
-if (!file_exists($f['logs'] . "/bot$botID.log")) file_put_contents($f['logs'] . "/bot$botID.log", "");
 ini_set('error_log', $f['logs'] . "/bot$botID.log");
 ini_set('ignore_repeated_errors', 1);
 
 # Autenticazione del Bot
 if ($config['password']) {
+	$password = urldecode($_GET['password']); //Password delle request
 	if ($password !== $config['password']) {
 		if ($config['devmode']) {
 			echo "<br><b>Bot Error:</b> Password delle request errata!<br>";
@@ -111,27 +111,10 @@ require $f['functions'];
 if (isset($userID)) {
 	if (in_array($userID, $admins)) {
 		$isadmin = true;
+		$isOwner = true;
 		include $f['plugin_manager'];
 	} else {
 		$isadmin = false;
-	}
-	# Whitelist utenti (modalità manutenzione o beta testing)
-	if ($config['whitelist_users'] !== false and is_array($config['whitelist_users'])) {
-		$config['whitelist_users'] = array_merge($config['whitelist_users'], $admins);
-		if (!in_array($userID, $config['whitelist_users'])) {
-			if ($typechat == "private") sm($chatID, "Bot in Whitelist");
-			die;
-		}
-	}
-}
-
-# Whitelist chat (modalità di protezione)
-if ($config['whitelist_chats'] !== false and is_array($config['whitelist_chats'])) {
-	if (!in_array($chatID, $config['whitelist_chats']) and in_array($typechat, ['group', 'supergroup', 'channel'])) {
-		if ($cmd == "start") {
-			sm($chatID, "Bot in whitelist per le chat");
-		}
-		die;
 	}
 }
 

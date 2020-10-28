@@ -2,7 +2,7 @@
 
 /*
 NeleBotFramework
-	Copyright (C) 2018	PHP-Coders
+	Copyright (C) 2018	NeleBot Framework
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -85,128 +85,16 @@ if ($config['usa_redis']) {
 	// Anti-Flood del Bot
 	if ($config['usa_il_db']) require($f['anti-flood']);
 } else {
-	if ($cmd == "redis" and $isadmin) {
-		sm($chatID, bold("Risultato del Test: ") . "❌\nRedis è disattivato!");
-		die;
-	}
+	botlog("Redis non è attivo dalla configurazione, per l'utilizzo di NeleBotX hai bisogno di Redis!", 'redis');
+	die;
 }
 
 # Connessione al Database
 $times['database'] = microtime(true);
 if ($config['usa_il_db']) {
-	if (strtolower($database['type']) == 'mysql') {
+	if (strtolower($database['type']) == 'postgre') {
 		try {
-			$PDO = new PDO("mysql:host=" . $database['host'] . ";dbname=" . $database['nome_database'] . ";charset=utf8mb4", $database['utente'], $database['password']);
-		} catch (PDOException $e) {
-			botlog($e->getMessage(), ['pdo', 'database'], $f['database']);
-			die;
-		}
-		$query = "CREATE TABLE IF NOT EXISTS utenti (
-		user_id BIGINT(20) NOT NULL ,
-		nome VARCHAR(64) NOT NULL ,
-		cognome VARCHAR(64) ,
-		username VARCHAR(32) ,
-		lang VARCHAR(10) NOT NULL ,
-		page VARCHAR(512) ,
-		settings VARCHAR(512) DEFAULT '[]',
-		first_update VARCHAR(64)	NOT NULL ,
-		last_update VARCHAR(64) NOT NULL ,
-		status VARCHAR(1024) DEFAULT '[]');";
-		$PDO->query($query);
-		$err = $PDO->errorInfo();
-		if ($err[0] !== "00000") {
-			botlog("PDO Error: errore nella creazione della tabella utenti, OUTPUT: " . json_encode($err), ['pdo', 'database'], $f['database']);
-			die;
-		}
-		$query = "CREATE TABLE IF NOT EXISTS gruppi (
-		chat_id BIGINT(20) NOT NULL ,
-		title VARCHAR(64) NOT NULL ,
-		description VARCHAR(256) ,
-		username VARCHAR(32) ,
-		admins VARCHAR(4096) DEFAULT '[]',
-		permissions VARCHAR(1024) DEFAULT '[]',
-		page VARCHAR(512) ,
-		status VARCHAR(1024) DEFAULT '[]');";
-		$PDO->query($query);
-		$err = $PDO->errorInfo();
-		if ($err[0] !== "00000") {
-			botlog("PDO Error: errore nella creazione della tabella gruppi, OUTPUT: " . json_encode($err), ['pdo', 'database'], $f['database']);
-			die;
-		}
-		if ($config['post_canali']) {
-			$query = "CREATE TABLE IF NOT EXISTS canali (
-			chat_id BIGINT(20) NOT NULL ,
-			title VARCHAR(64) NOT NULL ,
-			description VARCHAR(256) ,
-			username VARCHAR(32) ,
-			admins VARCHAR(4096) DEFAULT '[]' ,
-			page VARCHAR(512) ,
-			status VARCHAR(50) DEFAULT '[]');";
-			$PDO->query($query);
-			$err = $PDO->errorInfo();
-			if ($err[0] !== "00000") {
-				botlog("PDO Error: errore nella creazione della tabella gruppi, OUTPUT: " . json_encode($err), ['pdo', 'database'], $f['database']);
-				die;
-			}
-		}
-	} elseif (strtolower($database['type']) == 'sqlite') {
-		try {
-			$PDO = new PDO("sqlite:" . $database['nome_database'] . ";charset=utf8mb4");
-		} catch (PDOException $e) {
-			botlog($e->getMessage(), ['pdo', 'database'], $f['database']);
-			die;
-		}
-		$query = "CREATE TABLE IF NOT EXISTS utenti (
-		user_id BIGINT(20) NOT NULL ,
-		nome VARCHAR(64) NOT NULL ,
-		cognome VARCHAR(64) ,
-		username VARCHAR(32) ,
-		lang VARCHAR(10) NOT NULL ,
-		page VARCHAR(512) ,
-		settings VARCHAR(512) DEFAULT '[]',
-		first_update VARCHAR(64)	NOT NULL ,
-		last_update VARCHAR(64)	NOT NULL ,
-		status VARCHAR(1024)	DEFAULT '[]');";
-		$PDO->query($query);
-		$err = $PDO->errorInfo();
-		if ($err[0] !== "00000") {
-			botlog("PDO Error: errore nella creazione della tabella utenti, OUTPUT: " . json_encode($err), ['pdo', 'database'], $f['database']);
-			die;
-		}
-		$query = "CREATE TABLE IF NOT EXISTS gruppi (
-		chat_id BIGINT(20) NOT NULL ,
-		title VARCHAR(64) NOT NULL ,
-		description VARCHAR(256) ,
-		username VARCHAR(32) ,
-		admins VARCHAR(4096) DEFAULT '[]',
-		permissions VARCHAR(1024) DEFAULT '[]',
-		page VARCHAR(512) ,
-		status VARCHAR(1024) DEFAULT '[]');";
-		$PDO->query($query);
-		$err = $PDO->errorInfo();
-		if ($err[0] !== "00000") {
-			botlog("PDO Error: errore nella creazione della tabella gruppi, OUTPUT: " . json_encode($err), ['pdo', 'database'], $f['database']);
-			die;
-		}
-		if ($config['post_canali']) {
-			$query = "CREATE TABLE IF NOT EXISTS canali (
-			chat_id BIGINT(20) NOT NULL ,
-			title VARCHAR(64) NOT NULL ,
-			description VARCHAR(256) ,
-			username VARCHAR(32) ,
-			admins VARCHAR(4096) DEFAULT '[]' ,
-			page VARCHAR(512) ,
-			status VARCHAR(50) DEFAULT '[]');";
-			$PDO->query($query);
-			$err = $PDO->errorInfo();
-			if ($err[0] !== "00000") {
-				botlog("PDO Error: errore nella creazione della tabella canali, OUTPUT: " . json_encode($err), ['pdo', 'database'], $f['database']);
-				die;
-			}
-		}
-	} elseif (strtolower($database['type']) == 'postgre') {
-		try {
-			$PDO = new PDO("pgsql:host=" . $database['host'] . ";dbname=" . $database['nome_database'] . ";charset=utf8mb4", $database['utente'], $database['password']);
+			$PDO = new PDO("pgsql:host=" . $database['host'] . ";dbname=" . $database['nome_database'], $database['utente'], $database['password']);
 		} catch (PDOException $e) {
 			botlog($e->getMessage(), ['pdo', 'database'], $f['database']);
 			die;
@@ -217,6 +105,7 @@ if ($config['usa_il_db']) {
 		cognome VARCHAR ,
 		username VARCHAR ,
 		lang VARCHAR NOT NULL ,
+		ban VARCHAR DEFAULT '0',
 		page VARCHAR ,
 		settings VARCHAR DEFAULT '[]',
 		first_update VARCHAR NOT NULL ,
@@ -235,6 +124,7 @@ if ($config['usa_il_db']) {
 		username VARCHAR ,
 		admins VARCHAR DEFAULT '[]' ,
 		permissions VARCHAR DEFAULT '[]' ,
+		ban VARCHAR DEFAULT '0',
 		page VARCHAR NOT NULL ,
 		status VARCHAR DEFAULT '[]');";
 		$PDO->query($query);
@@ -243,24 +133,37 @@ if ($config['usa_il_db']) {
 			botlog("PDO Error: errore nella creazione della tabella gruppi, OUTPUT: " . json_encode($err), ['pdo', 'database'], $f['database']);
 			die;
 		}
-		if ($config['post_canali']) {
-			$query = "CREATE TABLE IF NOT EXISTS canali (
-			chat_id BIGINT NOT NULL ,
-			title VARCHAR NOT NULL ,
-			description VARCHAR ,
-			username VARCHAR ,
-			admins VARCHAR  DEFAULT '[]' ,
-			page VARCHAR ,
-			status VARCHAR  DEFAULT '[]');";
-			$PDO->query($query);
-			$err = $PDO->errorInfo();
-			if ($err[0] !== "00000") {
-				botlog("PDO Error: errore nella creazione della tabella canali, OUTPUT: " . json_encode($err), ['pdo', 'database'], $f['database']);
-				die;
-			}
+		$query = "CREATE TABLE IF NOT EXISTS canali (
+		chat_id BIGINT NOT NULL ,
+		title VARCHAR NOT NULL ,
+		description VARCHAR ,
+		username VARCHAR ,
+		admins VARCHAR  DEFAULT '[]' ,
+		ban VARCHAR DEFAULT '0',
+		page VARCHAR ,
+		status VARCHAR  DEFAULT '[]');";
+		$PDO->query($query);
+		$err = $PDO->errorInfo();
+		if ($err[0] !== "00000") {
+			botlog("PDO Error: errore nella creazione della tabella canali, OUTPUT: " . json_encode($err), ['pdo', 'database'], $f['database']);
+			die;
+		}
+		$query = "CREATE TABLE IF NOT EXISTS bots (
+		id INT NOT NULL ,
+		name VARCHAR NOT NULL ,
+		owner INT NOT NULL,
+		username VARCHAR ,
+		settings VARCHAR  DEFAULT '[]' ,
+		ban VARCHAR DEFAULT '0',
+		status INT  DEFAULT 1);";
+		$PDO->query($query);
+		$err = $PDO->errorInfo();
+		if ($err[0] !== "00000") {
+			botlog("PDO Error: errore nella creazione della tabella bots, OUTPUT: " . json_encode($err), ['pdo', 'database'], $f['database']);
+			die;
 		}
 	} else {
-		botlog("Errore: tipo di database sconosciuto.", ['database', 'framework'], $f['database']);
+		botlog("Errore: tipo di database non supportato per BotX.", ['database', 'framework'], $f['database']);
 		die;
 	}
 	
@@ -825,8 +728,6 @@ if ($config['usa_il_db']) {
 	}
 
 } else {
-	if ($cmd == "database" and $isadmin) {
-		sm($chatID, "Database non attivo");
-		die;
-	}
+	botlog("Database disattivato dalla configurazione, devi attivare il database su postgre per poter usare NeleBotX!", 'database');
+	die;
 }

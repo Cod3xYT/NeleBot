@@ -1,0 +1,15 @@
+{
+    "en": {
+        "buttonBack": "Back",
+        "callbackNotFound": "Your plugin doesn't detect this callback_data: '[0]'",
+        "messageCommandCanceled": "Command canceled...",
+        "messageNoCommandRunning": "No command running...",
+        "messageStartDevelopment": "\u2705 <b>Bot started!<\/b>\nNeleBot is now actived, concentrati sul plugin da sviluppare e il testing di esso.\n\u2139\ufe0f <code>Versione [0]<\/code>",
+        "messageUnknownCommand": "Unkown command...\n<i>Try \/start<\/i>"
+    },
+    "it": {
+        "buttonBack": "Indietro",
+        "callbackNotFound": "Il tuo plugin non ha preso questo callback_data: '[0]'",
+        "messageStartDevelopment": "\u2705 <b>Bot avviato!<\/b>\nNeleBot \u00e8 ora attivo, concentrati sul plugin da sviluppare e il testing di esso.\n\u2139\ufe0f <code>Versione [0]<\/code>"
+    }
+}

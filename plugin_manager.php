@@ -2,7 +2,7 @@
 
 /*
 NeleBotFramework
-	Copyright (C) 2018  PHP-Coders
+	Copyright (C) 2018  NeleBot Framework
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -26,11 +26,6 @@ $c = [
 	'true'	=> "✅",
 	'false'	=> "❌"
 ];
-
-if ($cmd == "devmode") {
-	sm($chatID, $c[$config['devmode']]);
-	die;
-}
 
 if ($cmd == "php") {
 	sm($chatID, phpversion ());

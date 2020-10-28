@@ -2,7 +2,7 @@
 
 /*
 NeleBotFramework
-	Copyright (C) 2018  PHP-Coders
+	Copyright (C) 2018  NeleBot Framework
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -70,11 +70,13 @@ if ($update and !$isadmin) {
 					$banFromAntiflood = $antiflood['punizione'];
 				}
 				$redis->set($userID, json_encode($json));
-				if ($msg or $cmd) {
-					botlog("L'utente $nome $cognome [$userID] è stato bannato per " . $antiflood['punizione'] . " secondi", 'antiflood');
-					sm($userID, $antiflood['ban-message']);
-				} elseif ($cbid) {
-					cb_reply($cbid, $antiflood['ban-message'], true);
+				if (isset($banFromAntiflood)) {
+					if ($msg or $cmd) {
+						if (isset($antiflood['ban-message'])) sm($userID, $antiflood['ban-message']);
+					} elseif ($cbid) {
+						if (isset($antiflood['ban-message'])) cb_reply($cbid, $antiflood['ban-message'], true);
+					}
+					botlog("L'utente " . tag() . " [$userID] è stato bannato per " . $antiflood['punizione'] . " secondi", 'antiflood');
 				}
 			}
 		} else {
