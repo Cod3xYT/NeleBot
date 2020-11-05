@@ -1,6 +1,7 @@
 <p align="center"> 
     <img src="https://telegra.ph/file/ac6357a663d43d529cb53.jpg" alt="Banner" /> 
 </p>
+## Base dedicata a Bot X Creator
 Non sai cosa sia Bot X Creator? Dai un'occhiata a [@BotXCreatorBot](https://t.me/BotXCreatorBot) su Telegram!
 
 ## Termini e condizioni per sviluppatori
